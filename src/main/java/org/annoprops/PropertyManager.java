@@ -1,6 +1,11 @@
 package org.annoprops;
 
+import org.annoprops.annotations.ConfigProperty;
+import org.annoprops.annotations.PropertyHolder;
+import org.springframework.beans.factory.ListableBeanFactory;
+
 import javax.annotation.Nonnull;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -56,6 +61,11 @@ public class PropertyManager {
 
 	@SuppressWarnings( "unused" )
 	public void readPropertiesFromFile(String fileName) throws IOException {
+		readPropertiesFromFile(new File(fileName));
+	}
+
+	@SuppressWarnings( "unused" )
+	public void readPropertiesFromFile(File fileName) throws IOException {
 		try ( FileInputStream propertiesFile = new FileInputStream(fileName) ) {
 			properties.clear();
 			properties.load(propertiesFile);
@@ -99,7 +109,7 @@ public class PropertyManager {
 
 	@Nonnull
 	private NullableOptional readValue(Field field) {
-		Class<?> fieldType = field.getClass();
+		Class<?> fieldType = field.getType();
 		String serialized = properties.getProperty(getName(field));
 		if ( serialized == null )
 			return NullableOptional.of(null);
@@ -115,7 +125,12 @@ public class PropertyManager {
 
 	@SuppressWarnings( "unused" )
 	public void savePropertiesToFile(String fileName) throws IOException {
-		try ( FileOutputStream propertiesFile = new FileOutputStream(fileName) ) {
+		savePropertiesToFile(new File(fileName));
+	}
+
+	@SuppressWarnings( "unused" )
+	public void savePropertiesToFile(File file) throws IOException {
+		try ( FileOutputStream propertiesFile = new FileOutputStream(file) ) {
 
 			propertyHolders.forEach(propertyHolder -> //
 					getAnnotatedFields(propertyHolder).forEach(field -> {
@@ -125,8 +140,8 @@ public class PropertyManager {
 									getSerialized(field.get(propertyHolder), field.getType()));
 						} catch (IllegalAccessException ignored) {} // impossible
 					}));
+
 			properties.store(propertiesFile, "IOMerge properties");
-			propertiesFile.close();
 		}
 	}
 
@@ -170,6 +185,18 @@ public class PropertyManager {
 
 		public Builder withObjects(Collection<?> propertyHolder) {
 			propertyHolders.addAll(propertyHolder);
+			return this;
+		}
+
+		/**
+		 * convenient method to use with Spring Bean Factory
+		 * gets beans annotated with {@link PropertyHolder} from given factory
+		 *
+		 * @param beanFactory bean factory to use
+		 */
+		public Builder withSpring(ListableBeanFactory beanFactory) {
+			Collection<Object> beans = beanFactory.getBeansWithAnnotation(PropertyHolder.class).values();
+			propertyHolders.addAll(beans);
 			return this;
 		}
 
