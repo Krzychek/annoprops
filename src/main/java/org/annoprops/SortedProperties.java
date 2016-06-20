@@ -10,6 +10,8 @@ import java.util.Set;
 
 class SortedProperties extends Properties {
 
+	private static final long serialVersionUID = -7852944216589332733L;
+
 	@SuppressWarnings( "unchecked" )
 	public Enumeration keys() {
 		List<String> keyList = new ArrayList<>(super.size());
