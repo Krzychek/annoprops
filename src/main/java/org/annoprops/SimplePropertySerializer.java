@@ -1,6 +1,5 @@
 package org.annoprops;
 
-import javax.annotation.Nonnull;
 import java.util.Arrays;
 
 
@@ -9,7 +8,6 @@ public class SimplePropertySerializer implements PropertySerializer {
 
 	private static final String NULL = "!";
 
-	@Nonnull
 	@Override
 	public String serialize(Object o) {
 		if ( o == null )
@@ -28,7 +26,6 @@ public class SimplePropertySerializer implements PropertySerializer {
 		throw new IllegalArgumentException("Object class is not supported" + o.getClass().getName());
 	}
 
-	@Nonnull
 	@Override
 	public NullableOptional deserialize(Class type, String value) {
 		if ( value == null )

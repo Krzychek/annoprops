@@ -4,7 +4,6 @@ import org.annoprops.annotations.ConfigProperty;
 import org.annoprops.annotations.PropertyHolder;
 import org.springframework.beans.factory.ListableBeanFactory;
 
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -107,7 +106,6 @@ public class PropertyManager {
 		return !value.isEmpty() ? value : field.getDeclaringClass().getName() + '#' + field.getName();
 	}
 
-	@Nonnull
 	private NullableOptional readValue(Field field) {
 		Class<?> fieldType = field.getType();
 		String serialized = properties.getProperty(getName(field));
