@@ -48,13 +48,4 @@
         </plugins>
     </build>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-            <version>4.3.0.RELEASE</version>
-            <optional>true</optional>
-        </dependency>
-    </dependencies>
-
 </project>

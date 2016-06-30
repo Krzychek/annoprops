@@ -2,7 +2,6 @@ package org.annoprops;
 
 import org.annoprops.annotations.ConfigProperty;
 import org.annoprops.annotations.PropertyHolder;
-import org.springframework.beans.factory.ListableBeanFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -190,11 +189,22 @@ public class PropertyManager {
 		 * convenient method to use with Spring Bean Factory
 		 * gets beans annotated with {@link PropertyHolder} from given factory
 		 *
-		 * @param beanFactory bean factory to use
+		 * @param beanFactory {@link org.springframework.beans.factory.ListableBeanFactory} to use
+		 *                    or any object which provides {@code Map #getBeansWithAnnotation(Class.class)} method
 		 */
-		public Builder withSpring(ListableBeanFactory beanFactory) {
-			Collection<Object> beans = beanFactory.getBeansWithAnnotation(PropertyHolder.class).values();
-			propertyHolders.addAll(beans);
+		@SuppressWarnings( "unchecked" )
+		public Builder withSpringListableBeanFactory(Object beanFactory) {
+			try {
+				Collection<Object> beans = ((Map<String, Object>) beanFactory.getClass() //
+						.getMethod("getBeansWithAnnotation", Class.class) //
+						.invoke(beanFactory, PropertyHolder.class)).values();
+
+				propertyHolders.addAll(beans);
+
+			} catch (ReflectiveOperationException e) {
+				throw new IllegalStateException("Not valid ListableBeanFactory provided", e);
+			}
+
 			return this;
 		}
 
