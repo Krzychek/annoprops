@@ -7,9 +7,9 @@
     <artifactId>annoprops-springframework</artifactId>
 
     <parent>
+        <groupId>com.github.Krzychek.annoprops</groupId>
         <artifactId>parent</artifactId>
-        <groupId>org.annoprops</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
 
     <properties>
@@ -18,9 +18,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.annoprops</groupId>
+            <groupId>com.github.Krzychek.annoprops</groupId>
             <artifactId>annoprops</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

@@ -90,7 +90,7 @@ public class PropertyManager {
         for (; fieldType != null; fieldType = fieldType.getSuperclass()) {
             PropertySerializer propertySerializer = serializers.get(fieldType);
             if (propertySerializer != null)
-                return propertySerializer.deserialize(fieldType, serialized);
+                return propertySerializer.deserialize(field.getType(), serialized);
         }
 
         throw new IllegalStateException("not found serializer for type" + fieldType.getCanonicalName());
