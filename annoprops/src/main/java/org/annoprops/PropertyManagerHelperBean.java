@@ -11,11 +11,11 @@ import java.io.IOException;
  */
 public class PropertyManagerHelperBean {
 
-    private final PropertyManager.Builder propertyManagerBuilder;
+    private final PropertyManagerBuilder propertyManagerBuilder;
     private final File propertiesFile;
     private PropertyManager propertyManager;
 
-    public PropertyManagerHelperBean(PropertyManager.Builder propertyManagerBuilder, File propertiesFile) {
+    public PropertyManagerHelperBean(PropertyManagerBuilder propertyManagerBuilder, File propertiesFile) {
         this.propertyManagerBuilder = propertyManagerBuilder;
         this.propertiesFile = propertiesFile;
     }

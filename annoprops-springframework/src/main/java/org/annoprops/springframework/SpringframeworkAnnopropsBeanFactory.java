@@ -1,9 +1,6 @@
 package org.annoprops.springframework;
 
-import org.annoprops.PropertyHolderProvider;
-import org.annoprops.PropertyManager;
-import org.annoprops.PropertyManagerHelperBean;
-import org.annoprops.PropertySerializer;
+import org.annoprops.*;
 import org.annoprops.annotations.PropertyHolder;
 import org.springframework.beans.factory.ListableBeanFactory;
 
@@ -18,7 +15,7 @@ public class SpringframeworkAnnopropsBeanFactory {
     public static PropertyManagerHelperBean createWithSpringFactory(
             ListableBeanFactory listableBeanFactory, File propertiesFile) {
 
-        PropertyManager.Builder propertyManagerBuilder = PropertyManager.builder()
+        PropertyManagerBuilder propertyManagerBuilder = PropertyManager.builder()
                 .withDefaultSerializers()
                 .usingPropertyHolderProvider(createProvider(listableBeanFactory));
 
@@ -31,7 +28,7 @@ public class SpringframeworkAnnopropsBeanFactory {
     public static PropertyManagerHelperBean createWithSpringFactoryAndAdditionalSerializers(
             ListableBeanFactory listableBeanFactory, File propertiesFile, Map<Class<?>, PropertySerializer> propertySerializers) {
 
-        PropertyManager.Builder propertyManagerBuilder = PropertyManager.builder()
+        PropertyManagerBuilder propertyManagerBuilder = PropertyManager.builder()
                 .withDefaultSerializers()
                 .withSerializers(propertySerializers)
                 .usingPropertyHolderProvider(createProvider(listableBeanFactory));
@@ -45,7 +42,7 @@ public class SpringframeworkAnnopropsBeanFactory {
     public static PropertyManagerHelperBean createWithSpringFactoryAndSerializers(
             ListableBeanFactory listableBeanFactory, File propertiesFile, Map<Class<?>, PropertySerializer> propertySerializers) {
 
-        PropertyManager.Builder propertyManagerBuilder = PropertyManager.builder()
+        PropertyManagerBuilder propertyManagerBuilder = PropertyManager.builder()
                 .withSerializers(propertySerializers)
                 .usingPropertyHolderProvider(createProvider(listableBeanFactory));
 

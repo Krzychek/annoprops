@@ -14,33 +14,21 @@ import java.util.stream.Collectors;
 @SuppressWarnings("WeakerAccess")
 public class PropertyManager {
 
-    private final static Map<Class<?>, PropertySerializer> DEFAULT_SERIALIZERS = Collections.unmodifiableMap(new HashMap<Class<?>, PropertySerializer>() {{
-        SimplePropertySerializer simplePropertySerializer = new SimplePropertySerializer();
-        put(Integer.class, simplePropertySerializer);
-        put(int.class, simplePropertySerializer);
-        put(Double.class, simplePropertySerializer);
-        put(double.class, simplePropertySerializer);
-        put(Float.class, simplePropertySerializer);
-        put(float.class, simplePropertySerializer);
-        put(String.class, simplePropertySerializer);
-        put(Enum.class, simplePropertySerializer);
-    }});
-
     private final Collection<Object> propertyHolders;
 
     private final Map<Class<?>, PropertySerializer> serializers;
 
     private final Properties properties;
 
-    private PropertyManager(Collection<Object> propertyHolders, Map<Class<?>, PropertySerializer> serializers) {
+    PropertyManager(Collection<Object> propertyHolders, Map<Class<?>, PropertySerializer> serializers) {
         this.propertyHolders = propertyHolders;
         this.serializers = serializers;
         this.properties = new SortedProperties();
     }
 
     @SuppressWarnings("unused")
-    public static Builder builder() {
-        return new Builder();
+    public static PropertyManagerBuilder builder() {
+        return new PropertyManagerBuilder();
     }
 
     @SuppressWarnings("unused")
@@ -140,58 +128,6 @@ public class PropertyManager {
             return serializers.get(Enum.class).serialize(obj);
 
         throw new IllegalStateException("not found serializer for type" + type.getCanonicalName());
-    }
-
-    public static class Builder {
-
-        private final List<PropertyHolderProvider> propertyHolderProviders = new LinkedList<>();
-
-        private final Collection<Object> propertyHolders = new ArrayList<>();
-
-        private final Map<Class<?>, PropertySerializer> serializers = new HashMap<>();
-
-        public Builder withSerializer(Class clazz, PropertySerializer serializer) {
-            this.serializers.put(clazz, serializer);
-            return this;
-        }
-
-        public Builder withSerializers(Map<Class<?>, PropertySerializer> serializers) {
-            this.serializers.putAll(serializers);
-            return this;
-        }
-
-        public Builder withDefaultSerializers() {
-            this.serializers.putAll(DEFAULT_SERIALIZERS);
-            return this;
-        }
-
-        public Builder withObject(Object propertyHolder) {
-            propertyHolders.add(propertyHolder);
-            return this;
-        }
-
-        public Builder withObjects(Collection<?> propertyHolder) {
-            propertyHolders.addAll(propertyHolder);
-            return this;
-        }
-
-        public Builder usingPropertyHolderProvider(PropertyHolderProvider propertyHolderProvider) {
-            propertyHolderProviders.add(propertyHolderProvider);
-            return this;
-        }
-
-        public Builder withObjects(Object... propertyHolder) {
-            return withObjects(Arrays.asList(propertyHolder));
-        }
-
-        public PropertyManager build() {
-            propertyHolderProviders.stream()
-                    .map(PropertyHolderProvider::getPropertyHolders)
-                    .flatMap(Collection::stream)
-                    .collect(Collectors.toCollection(() -> propertyHolders)); // wont work with pararell stream!
-
-            return new PropertyManager(propertyHolders, serializers);
-        }
     }
 
 }
