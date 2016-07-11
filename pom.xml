@@ -12,6 +12,7 @@
 
     <modules>
         <module>annoprops</module>
+        <module>annoprops-springframework</module>
     </modules>
 
     <properties>
