@@ -14,22 +14,17 @@ import java.util.stream.Collectors;
 @SuppressWarnings("WeakerAccess")
 public class PropertyManager {
 
-    private static Map<Class<?>, PropertySerializer> DEFAULT_SERIALIZERS;
-
-    static {
-        HashMap<Class<?>, PropertySerializer> classSerializers = new HashMap<>();
-
+    private final static Map<Class<?>, PropertySerializer> DEFAULT_SERIALIZERS = Collections.unmodifiableMap(new HashMap<Class<?>, PropertySerializer>() {{
         SimplePropertySerializer simplePropertySerializer = new SimplePropertySerializer();
-        classSerializers.put(Integer.class, simplePropertySerializer);
-        classSerializers.put(int.class, simplePropertySerializer);
-        classSerializers.put(Double.class, simplePropertySerializer);
-        classSerializers.put(double.class, simplePropertySerializer);
-        classSerializers.put(Float.class, simplePropertySerializer);
-        classSerializers.put(float.class, simplePropertySerializer);
-        classSerializers.put(String.class, simplePropertySerializer);
-        classSerializers.put(Enum.class, simplePropertySerializer);
-        DEFAULT_SERIALIZERS = Collections.unmodifiableMap(classSerializers);
-    }
+        put(Integer.class, simplePropertySerializer);
+        put(int.class, simplePropertySerializer);
+        put(Double.class, simplePropertySerializer);
+        put(double.class, simplePropertySerializer);
+        put(Float.class, simplePropertySerializer);
+        put(float.class, simplePropertySerializer);
+        put(String.class, simplePropertySerializer);
+        put(Enum.class, simplePropertySerializer);
+    }});
 
     private final Collection<Object> propertyHolders;
 
