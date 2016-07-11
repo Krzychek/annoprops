@@ -1,7 +1,5 @@
 package org.annoprops;
 
-
-
 @SuppressWarnings( "WeakerAccess" )
 public interface PropertySerializer {
 
