@@ -97,17 +97,18 @@ public class PropertyManager {
         return !value.isEmpty() ? value : field.getDeclaringClass().getName() + '#' + field.getName();
     }
 
-	private NullableOptional readValue(Field field) {
-		Class<?> fieldType = field.getType();
-		String serialized = properties.getProperty(getName(field));
-		if ( serialized == null )
-			return NullableOptional.of(null);
+    private NullableOptional readValue(Field field) {
+        String serialized = properties.getProperty(getName(field));
+        if (serialized == null)
+            return NullableOptional.empty();
 
-        if (serializers.containsKey(fieldType))
-            return serializers.get(fieldType).deserialize(fieldType, serialized);
+        Class<?> fieldType = field.getType();
 
-        if (fieldType.isEnum() && serializers.containsKey(Enum.class))
-            return serializers.get(Enum.class).deserialize(fieldType, serialized);
+        for (; fieldType != null; fieldType = fieldType.getSuperclass()) {
+            PropertySerializer propertySerializer = serializers.get(fieldType);
+            if (propertySerializer != null)
+                return propertySerializer.deserialize(fieldType, serialized);
+        }
 
         throw new IllegalStateException("not found serializer for type" + fieldType.getCanonicalName());
     }
