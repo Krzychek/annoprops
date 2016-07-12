@@ -38,7 +38,7 @@ public class PropertyManagerHelperBean {
                 propertiesFile);
     }
 
-    public PropertyManager getPropertyManager() {
+    private PropertyManager getPropertyManager() {
         if (propertyManager == null)
             propertyManager = propertyManagerBuilder.build();
 
