@@ -44,26 +44,20 @@ public class PropertyManagerBuilder {
     }
 
     @SuppressWarnings("unused")
-    public PropertyManagerBuilder withObject(Object propertyHolder) {
-        propertyHolders.add(propertyHolder);
-        return this;
-    }
-
-    @SuppressWarnings("unused")
     public PropertyManagerBuilder withObjects(Collection<?> propertyHolder) {
         propertyHolders.addAll(propertyHolder);
         return this;
     }
 
     @SuppressWarnings("unused")
-    public PropertyManagerBuilder usingPropertyHolderProvider(PropertyHolderProvider propertyHolderProvider) {
-        propertyHolderProviders.add(propertyHolderProvider);
-        return this;
+    public PropertyManagerBuilder withObjects(Object... propertyHolder) {
+        return withObjects(Arrays.asList(propertyHolder));
     }
 
     @SuppressWarnings("unused")
-    public PropertyManagerBuilder withObjects(Object... propertyHolder) {
-        return withObjects(Arrays.asList(propertyHolder));
+    public PropertyManagerBuilder usingPropertyHolderProvider(PropertyHolderProvider propertyHolderProvider) {
+        propertyHolderProviders.add(propertyHolderProvider);
+        return this;
     }
 
     @SuppressWarnings("unused")
