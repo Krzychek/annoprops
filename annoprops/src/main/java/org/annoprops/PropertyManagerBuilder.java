@@ -67,6 +67,8 @@ public class PropertyManagerBuilder {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toCollection(() -> propertyHolders)); // wont work with pararell stream!
 
+        if (serializers.isEmpty()) serializers.putAll(getDefaultSerializers());
+
         return new PropertyManager(propertyHolders, serializers);
     }
 }
