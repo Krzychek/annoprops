@@ -4,6 +4,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
 
 
 /**
@@ -18,6 +20,22 @@ public class PropertyManagerHelperBean {
     public PropertyManagerHelperBean(PropertyManagerBuilder propertyManagerBuilder, File propertiesFile) {
         this.propertyManagerBuilder = propertyManagerBuilder;
         this.propertiesFile = propertiesFile;
+    }
+
+    @SuppressWarnings("unused")
+    public static PropertyManagerHelperBean createWithFileAndObjects(File propertiesFile, Collection<?> objects) {
+        return new PropertyManagerHelperBean(
+                PropertyManager.builder().withObjects(objects),
+                propertiesFile);
+    }
+
+    @SuppressWarnings("unused")
+    public static PropertyManagerHelperBean createWithFileAndObjects(File propertiesFile, Collection<?> objects, Map<Class<?>, PropertySerializer> serializers) {
+        return new PropertyManagerHelperBean(
+                PropertyManager.builder()
+                        .withObjects(objects)
+                        .withSerializers(serializers),
+                propertiesFile);
     }
 
     public PropertyManager getPropertyManager() {
