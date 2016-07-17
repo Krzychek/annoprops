@@ -1,6 +1,6 @@
 package org.annoprops;
 
-@SuppressWarnings( "WeakerAccess" )
+@SuppressWarnings("WeakerAccess")
 public interface PropertySerializer {
 
 	String serialize(Object o);
