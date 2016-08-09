@@ -9,7 +9,7 @@
     <parent>
         <groupId>com.github.Krzychek.annoprops</groupId>
         <artifactId>parent</artifactId>
-        <version>1.0</version>
+        <version>master-SNAPSHOT</version>
     </parent>
 
     <properties>
