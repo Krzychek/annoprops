@@ -20,6 +20,8 @@ public class PropertyManagerBuilder {
             put(double.class, simplePropertySerializer);
             put(Float.class, simplePropertySerializer);
             put(float.class, simplePropertySerializer);
+            put(Boolean.class, simplePropertySerializer);
+            put(boolean.class, simplePropertySerializer);
             put(String.class, simplePropertySerializer);
             put(Enum.class, simplePropertySerializer);
         }};

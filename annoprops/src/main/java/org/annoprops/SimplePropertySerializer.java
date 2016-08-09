@@ -15,6 +15,9 @@ public class SimplePropertySerializer implements PropertySerializer {
         if (o instanceof Integer || o instanceof Double || o instanceof Float) {
             return o.toString();
         }
+        if (o instanceof Boolean) {
+            return o.toString();
+        }
         if (o.getClass().isEnum()) {
             return ((Enum) o).name();
         }
@@ -38,6 +41,9 @@ public class SimplePropertySerializer implements PropertySerializer {
 
         if (float.class.equals(type) || Float.class.equals(type))
             return Optional.of(Float.parseFloat(value));
+
+        if (boolean.class.equals(type) || Boolean.class.equals(type))
+            return Optional.of(Boolean.parseBoolean(value));
 
         if (type.isEnum()) {
             return Arrays.stream(type.getEnumConstants())
