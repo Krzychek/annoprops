@@ -8,7 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @SuppressWarnings("WeakerAccess")
@@ -23,7 +23,7 @@ public class PropertyManager {
     PropertyManager(Collection<Object> propertyHolders, Map<Class<?>, PropertySerializer> serializers) {
         this.propertyHolders = propertyHolders;
         this.serializers = serializers;
-        this.properties = new SortedProperties();
+        this.properties = new Properties();
     }
 
     @SuppressWarnings("unused")
@@ -37,8 +37,8 @@ public class PropertyManager {
     }
 
     @SuppressWarnings("unused")
-    public void readPropertiesFromFile(File fileName) throws IOException {
-        try (FileInputStream propertiesFile = new FileInputStream(fileName)) {
+    public void readPropertiesFromFile(File file) throws IOException {
+        try (FileInputStream propertiesFile = new FileInputStream(file)) {
             properties.clear();
             properties.load(propertiesFile);
 
@@ -47,43 +47,46 @@ public class PropertyManager {
     }
 
     private void setValuesInPropertyHolders() {
-        propertyHolders.forEach(propertyHolder -> //
-                getAnnotatedFields(propertyHolder).forEach(field -> {
-                    NullableOptional value = readValue(field);
+        propertyHolders.stream()
+                .flatMap(this::getPropertyDefs)
+                .forEach(def -> {
+                    Optional value = readValue(def.field);
                     if (value.isPresent()) {
-                        field.setAccessible(true);
+                        def.field.setAccessible(true);
                         try {
-                            field.set(propertyHolder, value.get());
-                            field.set(propertyHolder, value.get());
+                            def.field.set(def.holder, value.get());
                         } catch (IllegalAccessException ignored) {
                         } // impossible
                     }
-                }));
+                });
     }
 
-    private List<Field> getAnnotatedFields(Object o) {
-        List<Class<?>> oClasses = new LinkedList<>();
+    private Stream<PropertyDef> getPropertyDefs(Object o) {
+
+        // stream of o and all super classes
+        Stream.Builder<Class<?>> streamBuilder = Stream.builder();
         Class<?> aClass = o.getClass();
         do {
-            oClasses.add(aClass);
+            streamBuilder.accept(aClass);
             aClass = aClass.getSuperclass();
         } while (aClass != null);
 
-        return oClasses.stream() //
-                .flatMap(clazz -> Arrays.stream(clazz.getDeclaredFields())) //
-                .filter(field -> field.isAnnotationPresent(ConfigProperty.class)) //
-                .collect(Collectors.toList());
+        return streamBuilder.build()
+                .map(Class::getDeclaredFields)
+                .flatMap(Arrays::stream)
+                .filter(field -> field.isAnnotationPresent(ConfigProperty.class))
+                .map(field -> new PropertyDef(o, field));
     }
 
-    private String getName(Field field) {
+    private String getPropertyName(Field field) {
         String value = field.getAnnotation(ConfigProperty.class).value();
         return !value.isEmpty() ? value : field.getDeclaringClass().getName() + '#' + field.getName();
     }
 
-    private NullableOptional readValue(Field field) {
-        String serialized = properties.getProperty(getName(field));
+    private Optional readValue(Field field) {
+        String serialized = properties.getProperty(getPropertyName(field));
         if (serialized == null)
-            return NullableOptional.empty();
+            return Optional.empty();
 
         Class<?> fieldType = field.getType();
 
@@ -93,7 +96,7 @@ public class PropertyManager {
                 return propertySerializer.deserialize(field.getType(), serialized);
         }
 
-        throw new IllegalStateException("not found serializer for type" + fieldType.getCanonicalName());
+        throw new IllegalStateException("not found serializer for type" + field.getType().getCanonicalName());
     }
 
     @SuppressWarnings("unused")
@@ -105,29 +108,46 @@ public class PropertyManager {
     public void savePropertiesToFile(File file) throws IOException {
         try (FileOutputStream propertiesFile = new FileOutputStream(file)) {
 
-            propertyHolders.forEach(propertyHolder -> //
-                    getAnnotatedFields(propertyHolder).forEach(field -> {
-                        field.setAccessible(true);
+            propertyHolders.stream()
+                    .flatMap(this::getPropertyDefs)
+                    .forEach(def -> {
+                        def.field.setAccessible(true);
                         try {
-                            properties.setProperty(getName(field),
-                                    getSerialized(field.get(propertyHolder), field.getType()));
+                            getSerialized(def)
+                                    .ifPresent(serialized -> properties.setProperty(getPropertyName(def.field), serialized));
                         } catch (IllegalAccessException ignored) {
                         } // impossible
-                    }));
+                    });
 
             properties.store(propertiesFile, "IOMerge properties");
         }
     }
 
-    private String getSerialized(Object obj, Class<?> type) {
+    private Optional<String> getSerialized(PropertyDef def) throws IllegalAccessException {
+        Object value = def.field.get(def.holder);
+        if (value == null) return Optional.empty();
 
-        if (serializers.containsKey(type))
-            return serializers.get(type).serialize(obj);
+        Class type = def.field.getType();
 
+        PropertySerializer propertySerializer = serializers.get(type);
+        if (propertySerializer != null)
+            return Optional.of(propertySerializer.serialize(value));
+
+        // special handle for enum
         if (type.isEnum() && serializers.containsKey(Enum.class))
-            return serializers.get(Enum.class).serialize(obj);
+            return Optional.of(serializers.get(Enum.class).serialize(value));
 
-        throw new IllegalStateException("not found serializer for type" + type.getCanonicalName());
+        throw new IllegalStateException("not found serializer for type: " + type.getCanonicalName());
+    }
+
+    private static class PropertyDef {
+        public final Object holder;
+        public final Field field;
+
+        private PropertyDef(Object holder, Field field) {
+            this.holder = holder;
+            this.field = field;
+        }
     }
 
 }

@@ -1,9 +1,11 @@
 package org.annoprops;
 
+import java.util.Optional;
+
 @SuppressWarnings("WeakerAccess")
 public interface PropertySerializer {
 
-	String serialize(Object o);
+    String serialize(Object o);
 
-	NullableOptional deserialize(Class type, String value);
+    Optional deserialize(Class type, String value);
 }
